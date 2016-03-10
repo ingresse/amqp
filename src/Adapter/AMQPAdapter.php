@@ -3,11 +3,14 @@
 namespace PubSub\Adapter;
 
 use PubSub\Adapter\AdapterInterface;
+use PubSub\Config\ConfigInterface;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class AMQPAdapter implements AdapterInterface
 {
+    private $config;
+
     private $connection;
 
     private $channel;
@@ -16,58 +19,42 @@ class AMQPAdapter implements AdapterInterface
 
     private $queues = [];
 
-    public function __construct(
-        $host, 
-        $port, 
-        $user, 
-        $pass, 
-        $vhost
-    ) {
+    public function __construct(ConfigInterface $config) 
+    {
+        $this->config = $config->getConfig();
+        $connection   = $this->config['connection'];
+
         $this->connection = new AMQPStreamConnection(
-            $host, 
-            $port, 
-            $user, 
-            $pass, 
-            $vhost
+            $connection['host'], 
+            $connection['port'],
+            $connection['user'],
+            $connection['pass'],
+            $connection['vhost']
         );
         $this->channel = $this->connection->channel();
+        $this->setQueues();
     }
 
-    public function setQueue(
-        $queue, 
-        $passive = false, 
-        $durable = true, 
-        $exclusive = false,
-        $autoDelete = false,
-        $noWait = false
-    ) {
-        $this->channel->queue_declare(
-            $queue, 
-            $passive, 
-            $durable,
-            $exclusive,
-            $autoDelete, 
-            $noWait 
-        );
-        return $this;
+    private function setQueues() 
+    {
+        foreach ($this->config['queues'] as $queue => $params) {
+            $this->queues[] = $this->channel->queue_declare(
+                                $queue, 
+                                $params['passive'], 
+                                $params['durable'],
+                                $params['exclusive'],
+                                $params['autoDelete']
+                            );
+        }
     }
 
-    public function setExchange(
-        $exchange, 
-        $type, 
-        $passive = false, 
-        $durable = false, 
-        $autoDelete = false
-    ) {
+    public function setExchange($exchange, $type) 
+    {
         $this->exchange = $exchange;
         $this->channel->exchange_declare(
             $exchange, 
-            $type, 
-            $passive, 
-            $durable, 
-            $autoDelete
+            $type
         );
-        return $this;
     }
 
     public function getExchange()
@@ -86,10 +73,11 @@ class AMQPAdapter implements AdapterInterface
         return $this;
     }
 
-    public function send($payload, $properties)
+    public function send($payload)
     {
         foreach($payload as $item) {
-            $message = new AMQPMessage($item->getPayload(), $properties);
+            $message = new AMQPMessage($item->getPayload());
+            $this->defineDeliveryMode($message, $item->getLabel());
             $this->channel->basic_publish(
                 $message, 
                 $this->getExchange(), 
@@ -98,29 +86,28 @@ class AMQPAdapter implements AdapterInterface
         }
     }
 
-    public function consume(
-        $queue,
-        $consumeTag,
-        $noLocal,
-        $noAck,
-        $exclusive,
-        $noWait,
-        $callBack
-    ) {
+    private function defineDeliveryMode(&$message, $channelName)
+    {
+        $params = $this->config['queues'][$channelName];
+        $message->set('delivery_mode', $params['delivery_mode']);
+    }
+
+    public function consume($queue, $consumeTag, $callBack)
+    {
+        $params = $this->config['consume'][$consumeTag];
         $this->channel->basic_consume(
             $queue,
             $consumeTag,
-            $noLocal,
-            $noAck,
-            $exclusive,
-            $noWait,
+            $params['noLocal'],
+            $params['noAck'],
+            $params['exclusive'],
+            $params['noWait'],
             $callBack
         );
         
         while(count($this->channel->callbacks)) {
             $this->channel->wait();
         }
-
         $this->close();
     }
 

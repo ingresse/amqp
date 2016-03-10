@@ -38,12 +38,7 @@ class Subscriber implements SubscriberInterface
             ->consume(
                 $this->queue, 
                 $this->consumer->getTag(),
-                false,
-                false,
-                false,
-                false,
                 array($this->consumer, 'work')
             );
     }
-
 }

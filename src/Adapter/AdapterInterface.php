@@ -4,5 +4,7 @@ namespace PubSub\Adapter;
 
 interface AdapterInterface
 {
-    public function send($payload, $properties);
+    public function send($payload);
+
+    public function consume($queue, $consumeTag, $callBack);
 }

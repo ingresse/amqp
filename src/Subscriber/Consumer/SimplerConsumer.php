@@ -8,7 +8,7 @@ class SimplerConsumer implements ConsumerInterface
 {
     public function getTag()
     {
-        return static::class;
+        return 'Simpler';
     }
 
     public function work($message)
