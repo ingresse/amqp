@@ -3,19 +3,6 @@
 require '../vendor/autoload.php';
 
 
-echo "------ Generating Messages --------\n";
-
-$messages = [];
-
-for ($i = 1; $i <= 100000; $i++){
-    $data = ['id' => 467709,
-             'email' => 'my@email.com',
-             'domain' => 'email.com',
-             'name' => 'Teste'
-             ];
-    $messages[] = json_encode($data);
-}
-
 echo "------ Creating Adapter & Configs --------\n";
 
 $configData = [
@@ -58,22 +45,31 @@ $configData = [
     ]
 ];
 
-$config = new PubSub\Config\AMQPConfig($configData);
-$adapter = new PubSub\Adapter\AMQPAdapter($config);
+$config = new Ingresse\MessageQueuePHP\Config\AMQPConfig($configData);
+$adapter = new Ingresse\MessageQueuePHP\Adapter\AMQPAdapter($config);
 
 
 echo "------ Testing Publisher --------\n";
 
-$simplerProducer = new PubSub\Publisher\Producer\SimplerProducer($adapter);
-$simplerProducer
-    ->setMessages($messages)
-    ->send();
+$simplerProducer = new Ingresse\MessageQueuePHP\Publisher\Publisher($adapter, 'antifraud');
+
+for ($i = 1; $i <= 10000; $i++){
+    $data = ['id' => 467709,
+             'email' => 'my@email.com',
+             'domain' => 'email.com',
+             'name' => 'Teste'
+             ];
+    $simplerProducer
+        ->setMessage(json_encode($data))
+        ->send();
+}
+
 
 echo "------- Testing Subscriber -------\n";
 
-$subscriber = new PubSub\Subscriber\Subscriber($adapter);
-$simplerConsumer = new PubSub\Subscriber\Consumer\SimplerConsumer;
+$subscriber = new Ingresse\MessageQueuePHP\Subscriber\Subscriber($adapter);
+$simplerConsumer = new Ingresse\MessageQueuePHP\Subscriber\Consumer\SimplerConsumer;
 $subscriber
     ->setConsumer($simplerConsumer)
-    ->subscribe($simplerProducer::CHANNEL)
+    ->subscribe('antifraud')
     ->consume();

@@ -1,11 +1,18 @@
 <?php
 
-namespace PubSub\Publisher;
+namespace Ingresse\MessageQueuePHP\Publisher;
 
 interface PublisherInterface
 {
-    public function setMessages($messages = array());
+    /**
+     * @param [string] $message 
+     * @return void
+     */
+    public function setMessage($message);
 
+    /**
+     * @return void
+     */
     public function send();
 
 }

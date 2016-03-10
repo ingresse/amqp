@@ -1,27 +1,35 @@
 <?php
 
-namespace PubSub\Message;
+namespace Ingresse\MessageQueuePHP\Message;
 
 class Message
 {
-    protected $label;
-
+    /**
+     * @var [stribg]
+     */
     protected $payload;
 
-
-    public function __construct($label, $payload)
+    /**
+     * @param [string] $payload
+     */
+    public function __construct($payload)
     {
-        $this->label = $label;
         $this->payload = $payload;
     }
 
-    public function getLabel()
-    {
-        return $this->label;
-    }
-
+    /**
+     * @return [string]
+     */
     public function getPayload()
     {
         return $this->payload;
+    }
+
+    /**
+     * @return [string]
+     */
+    public function getJson()
+    {
+        return json_encode($this->payload);
     }
 }

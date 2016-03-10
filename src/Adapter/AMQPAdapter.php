@@ -1,24 +1,43 @@
 <?php
 
-namespace PubSub\Adapter;
+namespace Ingresse\MessageQueuePHP\Adapter;
 
-use PubSub\Adapter\AdapterInterface;
-use PubSub\Config\ConfigInterface;
+use Ingresse\MessageQueuePHP\Adapter\AdapterInterface;
+use Ingresse\MessageQueuePHP\Config\ConfigInterface;
+use Ingresse\MessageQueuePHP\Message\Message;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class AMQPAdapter implements AdapterInterface
 {
+    /**
+     * @var [ConfigInterface]
+     */
     private $config;
 
+    /**
+     * @var [AMQPStreamConnection]
+     */
     private $connection;
 
+    /**
+     * @var [type]
+     */
     private $channel;
 
+    /**
+     * @var [string]
+     */
     private $exchange;
 
+    /**
+     * @var array
+     */
     private $queues = [];
 
+    /**
+     * @param ConfigInterface $config
+     */
     public function __construct(ConfigInterface $config) 
     {
         $this->config = $config->getConfig();
@@ -35,6 +54,9 @@ class AMQPAdapter implements AdapterInterface
         $this->setQueues();
     }
 
+    /**
+     * @return [void]
+     */
     private function setQueues() 
     {
         foreach ($this->config['queues'] as $queue => $params) {
@@ -48,6 +70,10 @@ class AMQPAdapter implements AdapterInterface
         }
     }
 
+    /**
+     * @param [string] $exchange
+     * @param [string] $type
+     */
     public function setExchange($exchange, $type) 
     {
         $this->exchange = $exchange;
@@ -57,41 +83,58 @@ class AMQPAdapter implements AdapterInterface
         );
     }
 
+    /**
+     * @return [string]
+     */
     public function getExchange()
     {
         return $this->exchange;
     }
 
+    /**
+     * @return [array]
+     */
     public function getQueues()
     {
         return $this->queues;
     }
 
+    /**
+     * @param  [string] $queue
+     * @param  [string] $exchange
+     * @return [$this]
+     */
     public function bind($queue, $exchange)
     {
         $this->channel->queue_bind($queue, $exchange);
         return $this;
     }
 
-    public function send($payload)
+    /**
+     * @param  Message $message
+     * @param  [string]  $queue
+     * @param  [string]  $exchange
+     * @return [void]
+     */
+    public function send(Message $message, $queue, $exchange)
     {
-        foreach($payload as $item) {
-            $message = new AMQPMessage($item->getPayload());
-            $this->defineDeliveryMode($message, $item->getLabel());
-            $this->channel->basic_publish(
-                $message, 
-                $this->getExchange(), 
-                $item->getLabel()
-            );
-        }
+        $amqpMessage = new AMQPMessage($message->getPayload());
+
+        $this->defineDeliveryMode($amqpMessage, $queue);
+
+        $this->channel->basic_publish(
+            $amqpMessage, 
+            $exchange, 
+            $queue
+        );
     }
 
-    private function defineDeliveryMode(&$message, $channelName)
-    {
-        $params = $this->config['queues'][$channelName];
-        $message->set('delivery_mode', $params['delivery_mode']);
-    }
-
+    /**
+     * @param  [string] $queue
+     * @param  [string] $consumeTag
+     * @param  [object] $callBack
+     * @return [void]
+     */
     public function consume($queue, $consumeTag, $callBack)
     {
         $params = $this->config['consume'][$consumeTag];
@@ -111,9 +154,23 @@ class AMQPAdapter implements AdapterInterface
         $this->close();
     }
 
+    /**
+     * @return [void]
+     */
     public function close()
     {
         $this->channel->close();
         $this->connection->close();
+    }
+
+    /**
+     * @param  [Message] &$message
+     * @param  [string] $queueName
+     * @return [void]
+     */
+    private function defineDeliveryMode(&$message, $queueName)
+    {
+        $params = $this->config['queues'][$queueName];
+        $message->set('delivery_mode', $params['delivery_mode']);
     }
 }

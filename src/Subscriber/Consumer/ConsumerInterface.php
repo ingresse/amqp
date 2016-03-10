@@ -1,10 +1,17 @@
 <?php
 
-namespace PubSub\Subscriber\Consumer;
+namespace Ingresse\MessageQueuePHP\Subscriber\Consumer;
 
 interface ConsumerInterface
 {
+    /**
+     * @return [string]
+     */
     public function getTag();
 
+    /**
+     * @param  [string] $message
+     * @return [void]
+     */
     public function work($message);
 }

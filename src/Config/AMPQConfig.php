@@ -1,18 +1,27 @@
 <?php
 
-namespace PubSub\Config;
+namespace Ingresse\MessageQueuePHP\Config;
 
-use PubSub\Config\ConfigInterface;
+use Ingresse\MessageQueuePHP\Config\ConfigInterface;
 
 class AMQPConfig implements ConfigInterface
 {
+    /**
+     * @var array
+     */
     private $amqpConfig = [];
 
-    public function __construct($config)
+    /**
+     * @param array $config
+     */
+    public function __construct($config = array())
     {
         $this->amqpConfig = $config;
     }
 
+    /**
+     * @return [array]
+     */
     public function getConfig()
     {
         return $this->amqpConfig;
