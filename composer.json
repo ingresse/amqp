@@ -1,6 +1,22 @@
 {
+	"name": "ingresse/message-queue-php",
+    "type": "library",
+    "description": "Message Queue PubSub Pattern",
+    "keywords": ["pubsub","queue","amqp"],
+    "homepage": "https://github.com/ingresse/message-queue-php",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ingresse",
+            "email": "comunidade@ingresse.com",
+            "homepage": "https://github.com/ingresse",
+            "role": "Developer"
+        }
+    ],
     "require": {
-        "php-amqplib/php-amqplib": "2.5.*"
+        "php-amqplib/php-amqplib": "2.5.*",
+        "monolog/monolog"        : "1.17.*",
+		"predis/predis"          : "1.0.*"
     },
     "autoload": {
         "psr-4": {"Ingresse\\MessageQueuePHP\\": "src/"}

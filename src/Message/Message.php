@@ -28,7 +28,7 @@ class Message
     /**
      * @return [string]
      */
-    public function getJson()
+    public function toJson()
     {
         return json_encode($this->payload);
     }
