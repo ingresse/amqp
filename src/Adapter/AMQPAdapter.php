@@ -5,8 +5,10 @@ namespace Ingresse\MessageQueuePHP\Adapter;
 use Ingresse\MessageQueuePHP\Adapter\AdapterInterface;
 use Ingresse\MessageQueuePHP\Config\ConfigInterface;
 use Ingresse\MessageQueuePHP\Message\Message;
+use Ingresse\MessageQueuePHP\Logger\QueueLogger;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 
 class AMQPAdapter implements AdapterInterface
 {
@@ -36,6 +38,11 @@ class AMQPAdapter implements AdapterInterface
     private $queues = [];
 
     /**
+     * @var [Ingresse\Logger\QueueLogger]
+     */
+    public $logger;
+
+    /**
      * @param ConfigInterface $config
      */
     public function __construct(ConfigInterface $config) 
@@ -52,21 +59,19 @@ class AMQPAdapter implements AdapterInterface
         );
         $this->channel = $this->connection->channel();
         $this->setQueues();
-    }
 
-    /**
-     * @return [void]
-     */
-    private function setQueues() 
-    {
-        foreach ($this->config['queues'] as $queue => $params) {
-            $this->queues[] = $this->channel->queue_declare(
-                                $queue, 
-                                $params['passive'], 
-                                $params['durable'],
-                                $params['exclusive'],
-                                $params['autoDelete']
-                            );
+        if (isset($this->config['logger'])) {
+            $channel   = $this->config['logger']['channel'];
+            $redisKey  = $this->config['logger']['key'];
+            $redisHost = $this->config['logger']['host'];
+            $redisPort = $this->config['logger']['port'];
+            
+            $this->logger = new QueueLogger(
+                $channel, 
+                $redisKey, 
+                $redisHost, 
+                $redisPort
+            );
         }
     }
 
@@ -122,11 +127,18 @@ class AMQPAdapter implements AdapterInterface
 
         $this->defineDeliveryMode($amqpMessage, $queue);
 
-        $this->channel->basic_publish(
-            $amqpMessage, 
-            $exchange, 
-            $queue
-        );
+        try {
+            $this->channel->basic_publish(
+                $amqpMessage, 
+                $exchange, 
+                $queue
+            );
+        } catch (AMQPTimeoutException $exception){
+            $this->logger->setMessage(
+                $exception->getMessage(), 
+                'warning'
+            );
+        }
     }
 
     /**
@@ -161,6 +173,22 @@ class AMQPAdapter implements AdapterInterface
     {
         $this->channel->close();
         $this->connection->close();
+    }
+
+    /**
+     * @return [void]
+     */
+    private function setQueues() 
+    {
+        foreach ($this->config['queues'] as $queue => $params) {
+            $this->queues[] = $this->channel->queue_declare(
+                                $queue, 
+                                $params['passive'], 
+                                $params['durable'],
+                                $params['exclusive'],
+                                $params['autoDelete']
+                            );
+        }
     }
 
     /**

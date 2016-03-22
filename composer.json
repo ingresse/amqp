@@ -1,4 +1,18 @@
 {
+    "name": "ingresse/message-queue-php",
+    "type": "library",
+    "description": "Logging for PHP 5.3",
+    "keywords": ["amqp","queue", "pubsub"],
+    "homepage": "https://github.com/ingresse/message-queue-php",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ingresse",
+            "email": "comunidade@ingresse.com",
+            "homepage": "http://dev.ingresse.com/",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php-amqplib/php-amqplib": "2.5.*",
         "monolog/monolog"        : "1.17.*",
