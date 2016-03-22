@@ -1,8 +1,8 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Adapter;
+namespace MessageQueuePHP\Adapter;
 
-use Ingresse\MessageQueuePHP\Message\Message;
+use MessageQueuePHP\Message\Message;
 
 interface AdapterInterface
 {

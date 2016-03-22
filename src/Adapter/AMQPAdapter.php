@@ -1,11 +1,11 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Adapter;
+namespace MessageQueuePHP\Adapter;
 
-use Ingresse\MessageQueuePHP\Adapter\AdapterInterface;
-use Ingresse\MessageQueuePHP\Config\ConfigInterface;
-use Ingresse\MessageQueuePHP\Message\Message;
-use Ingresse\MessageQueuePHP\Logger\QueueLogger;
+use MessageQueuePHP\Adapter\AdapterInterface;
+use MessageQueuePHP\Config\ConfigInterface;
+use MessageQueuePHP\Message\Message;
+use MessageQueuePHP\Logger\QueueLogger;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Exception\AMQPTimeoutException;

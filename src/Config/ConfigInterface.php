@@ -1,6 +1,6 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Config;
+namespace MessageQueuePHP\Config;
 
 interface ConfigInterface
 {

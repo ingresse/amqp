@@ -1,7 +1,7 @@
 {
     "name": "ingresse/message-queue-php",
     "type": "library",
-    "description": "Logging for PHP 5.3",
+    "description": "Message Queue php library to publish and subscribe to queues with diferent types of adapters",
     "keywords": ["amqp","queue", "pubsub"],
     "homepage": "https://github.com/ingresse/message-queue-php",
     "license": "MIT",
@@ -16,9 +16,9 @@
     "require": {
         "php-amqplib/php-amqplib": "2.5.*",
         "monolog/monolog"        : "1.17.*",
-		"predis/predis"          : "1.1.*"
+        "predis/predis"          : "1.1.*"
     },
     "autoload": {
-        "psr-4": {"Ingresse\\MessageQueuePHP\\": "src/"}
+        "psr-4": {"MessageQueuePHP\\": "src/"}
     }
 }

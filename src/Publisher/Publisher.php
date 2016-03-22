@@ -1,10 +1,10 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Publisher;
+namespace MessageQueuePHP\Publisher;
 
-use Ingresse\MessageQueuePHP\Publisher\PublisherInterface;
-use Ingresse\MessageQueuePHP\Adapter\AdapterInterface;
-use Ingresse\MessageQueuePHP\Message\Message;
+use MessageQueuePHP\Publisher\PublisherInterface;
+use MessageQueuePHP\Adapter\AdapterInterface;
+use MessageQueuePHP\Message\Message;
 
 
 class Publisher implements PublisherInterface

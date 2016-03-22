@@ -1,8 +1,8 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Config;
+namespace MessageQueuePHP\Config;
 
-use Ingresse\MessageQueuePHP\Config\ConfigInterface;
+use MessageQueuePHP\Config\ConfigInterface;
 
 class AMQPConfig implements ConfigInterface
 {

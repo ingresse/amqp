@@ -38,18 +38,18 @@ $configData = [
     ]
 ];
 
-$config = new Ingresse\MessageQueuePHP\Config\AMQPConfig($configData);
-$adapter = new Ingresse\MessageQueuePHP\Adapter\AMQPAdapter($config);
+$config = new MessageQueuePHP\Config\AMQPConfig($configData);
+$adapter = new MessageQueuePHP\Adapter\AMQPAdapter($config);
 
 echo "------ Testing Publisher --------\n";
 
-$testProducer = new Ingresse\MessageQueuePHP\Publisher\Publisher($adapter, 'worker.test');
+$testProducer = new MessageQueuePHP\Publisher\Publisher($adapter, 'worker.test');
 
 
 echo "------- Testing Subscriber -------\n";
 
-$subscriber = new Ingresse\MessageQueuePHP\Subscriber\Subscriber($adapter);
-$simplerConsumer = new Ingresse\MessageQueuePHP\Subscriber\Consumer\SimplerConsumer;
+$subscriber = new MessageQueuePHP\Subscriber\Subscriber($adapter);
+$simplerConsumer = new MessageQueuePHP\Subscriber\Consumer\SimplerConsumer;
 $subscriber
    ->setConsumer($simplerConsumer)
    ->subscribe('worker.test')

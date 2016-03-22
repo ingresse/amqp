@@ -1,6 +1,6 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Publisher;
+namespace MessageQueuePHP\Publisher;
 
 interface PublisherInterface
 {

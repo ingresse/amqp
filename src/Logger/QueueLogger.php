@@ -1,6 +1,6 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Logger;
+namespace MessageQueuePHP\Logger;
 
 use Monolog\Logger;
 use Monolog\Handler\RedisHandler;

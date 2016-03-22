@@ -1,10 +1,10 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Subscriber;
+namespace MessageQueuePHP\Subscriber;
 
-use Ingresse\MessageQueuePHP\Subscriber\SubscriberInterface;
-use Ingresse\MessageQueuePHP\Subscriber\Consumer\ConsumerInterface;
-use Ingresse\MessageQueuePHP\Adapter\AdapterInterface;
+use MessageQueuePHP\Subscriber\SubscriberInterface;
+use MessageQueuePHP\Subscriber\Consumer\ConsumerInterface;
+use MessageQueuePHP\Adapter\AdapterInterface;
 
 class Subscriber implements SubscriberInterface
 {

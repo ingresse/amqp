@@ -1,8 +1,8 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Subscriber;
+namespace MessageQueuePHP\Subscriber;
 
-use Ingresse\MessageQueuePHP\Subscriber\Consumer\ConsumerInterface;
+use MessageQueuePHP\Subscriber\Consumer\ConsumerInterface;
 
 interface SubscriberInterface
 {

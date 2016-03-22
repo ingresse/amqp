@@ -1,6 +1,6 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Message;
+namespace MessageQueuePHP\Message;
 
 class Message
 {
