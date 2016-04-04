@@ -50,27 +50,39 @@ class AMQPAdapter implements AdapterInterface
         $this->config = $config->getConfig();
         $connection   = $this->config['connection'];
 
-        $this->connection = new AMQPStreamConnection(
-            $connection['host'], 
-            $connection['port'],
-            $connection['user'],
-            $connection['pass'],
-            $connection['vhost']
-        );
-        $this->channel = $this->connection->channel();
-        $this->setQueues();
+        try {
+            if (isset($this->config['logger'])) {
+                $channel   = $this->config['logger']['channel'];
+                $redisKey  = $this->config['logger']['key'];
+                $redisHost = $this->config['logger']['host'];
+                $redisPort = $this->config['logger']['port'];
+                
+                $this->logger = new QueueLogger(
+                    $channel, 
+                    $redisKey, 
+                    $redisHost, 
+                    $redisPort
+                );
+            }
+        } catch (Exception $exception) {
+            throw new Exception('Config is not load properly');
+        }
 
-        if (isset($this->config['logger'])) {
-            $channel   = $this->config['logger']['channel'];
-            $redisKey  = $this->config['logger']['key'];
-            $redisHost = $this->config['logger']['host'];
-            $redisPort = $this->config['logger']['port'];
-            
-            $this->logger = new QueueLogger(
-                $channel, 
-                $redisKey, 
-                $redisHost, 
-                $redisPort
+        try {
+            $this->connection = new AMQPStreamConnection(
+                $connection['host'], 
+                $connection['port'],
+                $connection['user'],
+                $connection['pass'],
+                $connection['vhost']
+            );
+        
+            $this->channel = $this->connection->channel();
+            $this->setQueues();  
+        } catch (Exception $exception) {
+            $this->logger->setMessage(
+                $exception->getMessage(), 
+                'warning'
             );
         }
     }
