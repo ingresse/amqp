@@ -8,7 +8,7 @@ use MessageQueuePHP\Message\Message;
 use MessageQueuePHP\Logger\QueueLogger;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
-use PhpAmqpLib\Exception\AMQPTimeoutException;
+use Exception;
 
 class AMQPAdapter implements AdapterInterface
 {
@@ -16,27 +16,22 @@ class AMQPAdapter implements AdapterInterface
      * @var [ConfigInterface]
      */
     private $config;
-
     /**
      * @var [AMQPStreamConnection]
      */
     private $connection;
-
     /**
      * @var [type]
      */
     private $channel;
-
     /**
      * @var [string]
      */
     private $exchange;
-
     /**
      * @var array
      */
     private $queues = [];
-
     /**
      * @var [Ingresse\Logger\QueueLogger]
      */
@@ -45,47 +40,59 @@ class AMQPAdapter implements AdapterInterface
     /**
      * @param ConfigInterface $config
      */
-    public function __construct(ConfigInterface $config) 
+    public function __construct(ConfigInterface $config)
     {
-        $this->config = $config->getConfig();
-        $connection   = $this->config['connection'];
-
-        $this->connection = new AMQPStreamConnection(
-            $connection['host'], 
-            $connection['port'],
-            $connection['user'],
-            $connection['pass'],
-            $connection['vhost']
-        );
-        $this->channel = $this->connection->channel();
-        $this->setQueues();
-
-        if (isset($this->config['logger'])) {
-            $channel   = $this->config['logger']['channel'];
-            $redisKey  = $this->config['logger']['key'];
-            $redisHost = $this->config['logger']['host'];
-            $redisPort = $this->config['logger']['port'];
-            
-            $this->logger = new QueueLogger(
-                $channel, 
-                $redisKey, 
-                $redisHost, 
-                $redisPort
-            );
+        try {
+            $this->config     = $config->getConfig();
+            $this->logger     = $this->prepareLogger();
+            $this->connection = $this->prepareConnection();
+            $this->channel    = $this->connection->channel();
+            $this->setQueues();
+        } catch (Exception $exception) {
+            throw new Exception('AMQPAdapter can not be loaded.
+                Check config settings and/or access to AMQP Server');
         }
+    }
+
+    /**
+     * @return PhpAmqpLib\Connection\AMQPStreamConnection
+     */
+    private function prepareConnection()
+    {
+        return new AMQPStreamConnection(
+            $this->config['connection']['host'],
+            $this->config['connection']['port'],
+            $this->config['connection']['user'],
+            $this->config['connection']['pass'],
+            $this->config['connection']['vhost']
+        );
+    }
+
+    /**
+     * @return MessageQueuePHP\Logger\QueueLogger
+     */
+    private function prepareLogger()
+    {
+        if (!isset($this->config['logger'])) {
+            return null;
+        }
+
+        $channel   = $this->config['logger']['channel'];
+        $redisKey  = $this->config['logger']['key'];
+        $redisHost = $this->config['logger']['host'];
+        $redisPort = $this->config['logger']['port'];
+
+        return new QueueLogger($channel, $redisKey, $redisHost, $redisPort);
     }
 
     /**
      * @param [string] $exchange
      * @param [string] $type
      */
-    public function setExchange($exchange, $type) 
+    public function setExchange($exchange, $type)
     {
         $this->exchange = $exchange;
-        $this->channel->exchange_declare(
-            $exchange, 
-            $type
-        );
+        $this->channel->exchange_declare($exchange, $type);
     }
 
     /**
@@ -129,15 +136,16 @@ class AMQPAdapter implements AdapterInterface
 
         try {
             $this->channel->basic_publish(
-                $amqpMessage, 
-                $exchange, 
+                $amqpMessage,
+                $exchange,
                 $queue
             );
-        } catch (AMQPTimeoutException $exception){
+        } catch (Exception $exception){
             $this->logger->setMessage(
-                $exception->getMessage(), 
+                $exception->getMessage(),
                 'warning'
             );
+            throw $exception;
         }
     }
 
@@ -159,7 +167,7 @@ class AMQPAdapter implements AdapterInterface
             $params['noWait'],
             $callBack
         );
-        
+
         while(count($this->channel->callbacks)) {
             $this->channel->wait();
         }
@@ -178,16 +186,16 @@ class AMQPAdapter implements AdapterInterface
     /**
      * @return [void]
      */
-    private function setQueues() 
+    private function setQueues()
     {
         foreach ($this->config['queues'] as $queue => $params) {
             $this->queues[] = $this->channel->queue_declare(
-                                $queue, 
-                                $params['passive'], 
-                                $params['durable'],
-                                $params['exclusive'],
-                                $params['autoDelete']
-                            );
+                $queue,
+                $params['passive'],
+                $params['durable'],
+                $params['exclusive'],
+                $params['autoDelete']
+            );
         }
     }
 
