@@ -57,17 +57,17 @@ Now the message-queue-php will be autoloaded into your project.
         ]
     ];
 
-    $config = new Ingresse\MessageQueuePHP\Config\AMQPConfig($configData);
-    $amqpAdapter = new Ingresse\MessageQueuePHP\Adapter\AMQPAdapter($config);
+    $config = new MessageQueuePHP\Config\AMQPConfig($configData);
+    $amqpAdapter = new MessageQueuePHP\Adapter\AMQPAdapter($config);
 
 
-    $myPublisher = new Ingresse\MessageQueuePHP\Publisher\Publisher($amqpAdapter, 'worker.test');
+    $myPublisher = new MessageQueuePHP\Publisher\Publisher($amqpAdapter, 'worker.test');
     $myPublisher
             ->setMessage($myData)
             ->send();
 
-    $subscriber = new Ingresse\MessageQueuePHP\Subscriber\Subscriber($amqpAdapter);
-    $simplerConsumer = new Ingresse\MessageQueuePHP\Subscriber\Consumer\SimplerConsumer;
+    $subscriber = new MessageQueuePHP\Subscriber\Subscriber($amqpAdapter);
+    $simplerConsumer = new MessageQueuePHP\Subscriber\Consumer\SimplerConsumer;
     $subscriber
        ->setConsumer($simplerConsumer)
        ->subscribe('worker.test')
