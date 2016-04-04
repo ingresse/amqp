@@ -57,7 +57,7 @@ Now the message-queue-php will be autoloaded into your project.
         ]
     ];
 
-    $config = new essageQueuePHP\Config\AMQPConfig($configData);
+    $config = new MessageQueuePHP\Config\AMQPConfig($configData);
     $amqpAdapter = new MessageQueuePHP\Adapter\AMQPAdapter($config);
 
 

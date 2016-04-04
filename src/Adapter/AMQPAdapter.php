@@ -64,11 +64,7 @@ class AMQPAdapter implements AdapterInterface
                     $redisPort
                 );
             }
-        } catch (Exception $exception) {
-            throw new Exception('Config is not load properly');
-        }
 
-        try {
             $this->connection = new AMQPStreamConnection(
                 $connection['host'], 
                 $connection['port'],
@@ -80,10 +76,7 @@ class AMQPAdapter implements AdapterInterface
             $this->channel = $this->connection->channel();
             $this->setQueues();  
         } catch (Exception $exception) {
-            $this->logger->setMessage(
-                $exception->getMessage(), 
-                'warning'
-            );
+            throw new Exception('Config is not load properly');
         }
     }
 
