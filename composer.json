@@ -14,9 +14,8 @@
         }
     ],
     "require": {
-        "php-amqplib/php-amqplib": "2.5.*",
-        "monolog/monolog"        : "1.17.*",
-        "predis/predis"          : "1.1.*"
+        "php-amqplib/php-amqplib": "2.6.*",
+        "monolog/monolog"        : "1.17.*"
     },
     "autoload": {
         "psr-4": {"MessageQueuePHP\\": "src/"}
