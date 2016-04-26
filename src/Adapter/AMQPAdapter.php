@@ -44,7 +44,7 @@ class AMQPAdapter implements AdapterInterface
     {
         try {
             $this->config     = $config->getConfig();
-            $this->logger     = $this->prepareLogger();
+            $this->logger     = $this->prepareLogger($config);
             $this->connection = $this->prepareConnection();
             $this->channel    = $this->connection->channel();
             $this->setQueues();
@@ -69,20 +69,15 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
+     * @param  $config
      * @return MessageQueuePHP\Logger\QueueLogger
      */
-    private function prepareLogger()
+    private function prepareLogger($config)
     {
         if (!isset($this->config['logger'])) {
             return null;
         }
-
-        $channel   = $this->config['logger']['channel'];
-        $redisKey  = $this->config['logger']['key'];
-        $redisHost = $this->config['logger']['host'];
-        $redisPort = $this->config['logger']['port'];
-
-        return new QueueLogger($channel, $redisKey, $redisHost, $redisPort);
+        return new QueueLogger($config);
     }
 
     /**
