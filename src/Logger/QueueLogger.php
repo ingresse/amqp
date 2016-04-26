@@ -10,6 +10,7 @@ use MessageQueuePHP\Message\Message;
 use MessageQueuePHP\Adapter\AdapterInterface;
 use MessageQueuePHP\Config\ConfigInterface;
 use Predis\Client as RedisClient;
+use Exception;
 
 class QueueLogger implements AdapterInterface
 {
@@ -35,19 +36,20 @@ class QueueLogger implements AdapterInterface
         $path    = $configLogger['logger']['path'];
 
         $redisClient  = new RedisClient([
-                    'scheme' => 'tcp',
-                    'host'   => $host,
-                    'port'   => $port
-                ]);
+            'scheme' => 'tcp',
+            'host'   => $host,
+            'port'   => $port
+        ]);
 
         try {
             $redisClient->ping();
             $handler   = new RedisHandler($redisClient, $key);
-            $formatter = new LogstashFormatter($channel);
-            $handler->setFormatter($formatter);
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             $handler = new StreamHandler($path);
         }
+
+        $formatter = new LogstashFormatter($channel);
+        $handler->setFormatter($formatter);
 
         $this->logger = new Logger($channel, array($handler));
     }
@@ -56,9 +58,9 @@ class QueueLogger implements AdapterInterface
      * @param string $message
      * @param string $level
      */
-    public function setMessage($message, $level)
+    public function setMessage($message, $level, $extras = array())
     {
-        $this->logger->$level($message);
+        $this->logger->$level($message, $extras);
     }
 
     /**
@@ -69,7 +71,15 @@ class QueueLogger implements AdapterInterface
      */
     public function send(Message $message, $queue, $exchange)
     {
-        $this->logger->info($message->getPayload(), [$queue]);
+        $this->setMessage(
+            'Message Queue is not Working', 
+            'warning', 
+            [
+                'message'  => $message->getPayload(), 
+                'queue'    => $queue, 
+                'exchange' => $exchange
+            ]
+        );
     }
 
     /**
