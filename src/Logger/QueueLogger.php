@@ -4,6 +4,7 @@ namespace MessageQueuePHP\Logger;
 
 use Monolog\Logger;
 use Monolog\Handler\RedisHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Formatter\LogstashFormatter;
 use MessageQueuePHP\Message\Message;
 use MessageQueuePHP\Adapter\AdapterInterface;
@@ -31,6 +32,7 @@ class QueueLogger implements AdapterInterface
         $port    = $configLogger['logger']['port'];
         $key     = $configLogger['logger']['key'];
         $channel = $configLogger['logger']['channel'];
+        $path    = $configLogger['logger']['path'];
 
         $redisClient  = new RedisClient([
                     'scheme' => 'tcp',
@@ -38,11 +40,16 @@ class QueueLogger implements AdapterInterface
                     'port'   => $port
                 ]);
 
-        $redisHandler = new RedisHandler($redisClient, $key);
-        $formatter    = new LogstashFormatter($channel);
-        $redisHandler->setFormatter($formatter);
+        try {
+            $redisClient->ping();
+            $handler   = new RedisHandler($redisClient, $key);
+            $formatter = new LogstashFormatter($channel);
+            $handler->setFormatter($formatter);
+        }catch (Exception $e) {
+            $handler = new StreamHandler($path);
+        }
 
-        $this->logger = new Logger($channel, array($redisHandler));
+        $this->logger = new Logger($channel, array($handler));
     }
 
     /**

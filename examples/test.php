@@ -34,7 +34,8 @@ $configData = [
         'host' => 'localhost',
         'port' => 6379,
         'key' => 'logstash',
-        'channel' => 'message-queue-php'
+        'channel' => 'message-queue-php',
+        'path' => '/var/logs/message-queue-php.log'
     ]
 ];
 
