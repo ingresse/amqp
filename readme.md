@@ -54,7 +54,7 @@ Now the message-queue-php will be autoloaded into your project.
             'port' => 6379,
             'key' => 'logstash',
             'channel' => 'message-queue-php'
-            path' => '/var/logs/message-queue-php.log'
+            path' => '/var/log/message-queue-php.log'
         ]
     ];
 
