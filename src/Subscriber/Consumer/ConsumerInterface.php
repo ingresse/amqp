@@ -1,6 +1,6 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Subscriber\Consumer;
+namespace MessageQueuePHP\Subscriber\Consumer;
 
 interface ConsumerInterface
 {

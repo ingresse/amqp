@@ -1,11 +1,11 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Subscriber\Consumer;
+namespace MessageQueuePHP\Subscriber\Consumer;
 
-use Ingresse\MessageQueuePHP\Subscriber\Consumer\ConsumerInterface;
+use MessageQueuePHP\Subscriber\Consumer\ConsumerInterface;
 
 class SimplerConsumer implements ConsumerInterface
-{   
+{
     /**
      * @return [string]
      */
