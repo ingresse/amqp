@@ -11,6 +11,7 @@ use MessageQueuePHP\Adapter\AdapterInterface;
 use MessageQueuePHP\Config\ConfigInterface;
 use Predis\Client as RedisClient;
 use Exception;
+use OutOfBoundsException;
 
 class QueueLogger implements AdapterInterface
 {
@@ -99,34 +100,15 @@ class QueueLogger implements AdapterInterface
                 Check config settings.');
         }
 
-        $configs = [
-            'host' => 'localhost',
-            'port' => 6379,
-            'key'  => 'logstash',
-            'channel' => 'message-queue-php',
-            'path' => '/var/log/message-queue-php.log'
-        ];
+        $defaultParams = ['host', 'port', 'key', 'channel', 'path'];
 
-        if (isset($config['logger']['host'])) {
-            $configs['host'] = $config['logger']['host'];
+        foreach ($defaultParams as $arg) {
+            if (!isset($config['logger'][$arg])) {
+                throw new OutOfBoundsException("The LoggerAdapter parameters are
+                 missing. Check config settings.");
+            }
         }
 
-        if (isset($config['logger']['port'])) {
-            $configs['port'] = $config['logger']['port'];
-        }
-
-        if (isset($config['logger']['key'])) {
-            $configs['key'] = $config['logger']['key'];
-        }
-
-        if (isset($config['logger']['channel'])) {
-            $configs['channel'] = $config['logger']['channel'];
-        }
-
-        if (isset($config['logger']['path'])) {
-            $configs['path'] = $config['logger']['path'];
-        }
-
-        return $configs;
+        return $config['logger'];
     }
 }
