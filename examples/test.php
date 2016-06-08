@@ -31,7 +31,7 @@ $configData = [
         ],
     ],
     'logger' => [
-        'host' => 'localhost',
+        'host' => 'localhost2',
         'port' => 6379,
         'key' => 'logstash',
         'channel' => 'message-queue-php',
@@ -40,11 +40,15 @@ $configData = [
 ];
 
 $config = new MessageQueuePHP\Config\AMQPConfig($configData);
-$adapter = new MessageQueuePHP\Adapter\AMQPAdapter($config);
+
+$amqpAdapter = new MessageQueuePHP\Adapter\AMQPAdapter($config);
+$loggerAdapter = new MessageQueuePHP\Logger\QueueLogger($config);
 
 echo "------ Testing Publisher --------\n";
 
-$testProducer = new MessageQueuePHP\Publisher\Publisher($adapter, 'worker.test');
+$testProducer = new MessageQueuePHP\Publisher\Publisher($amqpAdapter, 'worker.test');
+
+$testProducer->setMessage('Hello World')->send();
 
 
 echo "------- Testing Subscriber -------\n";
