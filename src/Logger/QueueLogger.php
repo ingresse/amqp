@@ -104,8 +104,10 @@ class QueueLogger implements AdapterInterface
 
         foreach ($defaultParams as $arg) {
             if (!isset($config['logger'][$arg])) {
-                throw new OutOfBoundsException("The LoggerAdapter parameters are
-                 missing. Check config settings.");
+                throw new OutOfBoundsException(
+                    "Parameters of LoggerAdapter MessageQueue
+                    are missing. Check config settings."
+                );
             }
         }
 
