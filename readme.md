@@ -41,6 +41,19 @@ Now the message-queue-php will be autoloaded into your project.
                 'delivery_mode' => 2
             ]
         ],
+        'exchanges' => [
+            'exchange.test' => [                
+                'type' => 'fanout'
+                'passive' => false,
+                'durable' => true,
+                'auto_delete' => false,
+                'internal' => false,
+                'nowait' => false,
+                'arguments' => false,
+                'ticket' => false,
+                'delivery_mode' => 2
+            ]
+        ],
         'consume' => [
             'Simpler' => [
                 'noLocal' => false,
