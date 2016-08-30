@@ -7,9 +7,19 @@ use MessageQueuePHP\Adapter\AMQPAdapter;
 
 class FactoryAdapter
 {
-    public function create(array $connection, array $logger)
+    /**
+     * @param  array  $connection
+     * @param  array  $queues
+     * @param  array  $logger
+     * @return MessageQueuePHP\Adapter\AMQPAdapter
+     */
+    public function create(array $connection, array $queues, array $logger)
     {
-        $params = ['connection' => $connection, 'logger' => $logger];
+        $params = [
+            'connection' => $connection,
+            'queues'     => $queues,
+            'logger'     => $logger
+        ];
         return new AMQPAdapter(new Config($params));
     }
 }
