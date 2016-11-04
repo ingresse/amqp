@@ -48,6 +48,7 @@ class AMQPAdapter implements AdapterInterface
             $this->connection = $this->prepareConnection();
             $this->channel    = $this->connection->channel();
             $this->setQueues();
+            $this->setExchanges();
         } catch (Exception $exception) {
             throw new Exception('AMQPAdapter can not be loaded.
                 Check config settings and/or access to AMQP Server');
@@ -127,7 +128,7 @@ class AMQPAdapter implements AdapterInterface
     {
         $amqpMessage = new AMQPMessage($message->getPayload());
 
-        $this->defineDeliveryMode($amqpMessage, $queue);
+        $this->defineDeliveryMode($amqpMessage, $queue, $exchange);
 
         try {
             $this->channel->basic_publish(
@@ -195,13 +196,39 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
+     * @return [void]
+     */
+    private function setExchanges()
+    {
+        foreach ($this->config['exchanges'] as $exchange => $params) {
+            $this->exchanges[] = $this->channel->exchange_declare(
+                $exchange,
+                $params['type'],
+                $params['passive'],
+                $params['durable'],
+                $params['auto_delete'],
+                $params['internal'],
+                $params['nowait'],
+                $params['arguments'],
+                $params['ticket']
+            );
+        }
+    }
+
+    /**
      * @param  [Message] &$message
      * @param  [string] $queueName
      * @return [void]
      */
-    private function defineDeliveryMode(&$message, $queueName)
+    private function defineDeliveryMode(&$message, $queue, $exchange)
     {
-        $params = $this->config['queues'][$queueName];
+        if (!empty($exchange)) {
+            $params = $this->config['exchanges'][$exchange];
+            $message->set('delivery_mode', $params['delivery_mode']);
+            return;
+        }
+
+        $params = $this->config['queues'][$queue];
         $message->set('delivery_mode', $params['delivery_mode']);
     }
 }
