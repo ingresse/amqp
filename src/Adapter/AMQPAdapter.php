@@ -13,19 +13,19 @@ use Exception;
 class AMQPAdapter implements AdapterInterface
 {
     /**
-     * @var [ConfigInterface]
+     * @var MessageQueuePHP\Config\ConfigInterface
      */
     private $config;
     /**
-     * @var [AMQPStreamConnection]
+     * @var PhpAmqpLib\Connection\AMQPStreamConnection
      */
     private $connection;
     /**
-     * @var [type]
+     * @var PhpAmqpLib\Channel\AMQPChannel
      */
     private $channel;
     /**
-     * @var [string]
+     * @var string
      */
     private $exchange;
     /**
@@ -33,12 +33,12 @@ class AMQPAdapter implements AdapterInterface
      */
     private $queues = [];
     /**
-     * @var [Ingresse\Logger\QueueLogger]
+     * @var Ingresse\Logger\QueueLogger
      */
     public $logger;
 
     /**
-     * @param ConfigInterface $config
+     * @param MessageQueuePHP\Config\ConfigInterface $config
      */
     public function __construct(ConfigInterface $config)
     {
@@ -70,7 +70,7 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @param  $config
+     * @param  MessageQueuePHP\Config\ConfigInterface $config
      * @return MessageQueuePHP\Logger\QueueLogger
      */
     private function prepareLogger($config)
@@ -82,8 +82,8 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @param [string] $exchange
-     * @param [string] $type
+     * @param string $exchange
+     * @param string $type
      */
     public function setExchange($exchange, $type)
     {
@@ -92,7 +92,7 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @return [string]
+     * @return string
      */
     public function getExchange()
     {
@@ -100,7 +100,7 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @return [array]
+     * @return array
      */
     public function getQueues()
     {
@@ -108,9 +108,9 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @param  [string] $queue
-     * @param  [string] $exchange
-     * @return [$this]
+     * @param  string $queue
+     * @param  string $exchange
+     * @return self
      */
     public function bind($queue, $exchange)
     {
@@ -119,14 +119,14 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @param  Message $message
-     * @param  [string]  $queue
-     * @param  [string]  $exchange
-     * @return [void]
+     * @param  MessageQueuePHP\Message\Message $message
+     * @param  string                          $queue
+     * @param  string                          $exchange
+     * @return void
      */
     public function send(Message $message, $queue, $exchange)
     {
-        $amqpMessage = new AMQPMessage($message->getPayload());
+        $amqpMessage = new AMQPMessage($message->getPayload(), $message->getOptions());
 
         $this->defineDeliveryMode($amqpMessage, $queue, $exchange);
 
@@ -146,10 +146,10 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @param  [string] $queue
-     * @param  [string] $consumeTag
-     * @param  [object] $callBack
-     * @return [void]
+     * @param  string        $queue
+     * @param  string        $consumeTag
+     * @param  callable|null $callBack
+     * @return void
      */
     public function consume($queue, $consumeTag, $callBack)
     {
@@ -171,7 +171,7 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @return [void]
+     * @return void
      */
     public function close()
     {
@@ -180,7 +180,7 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @return [void]
+     * @return void
      */
     private function setQueues()
     {
@@ -196,7 +196,7 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @return [void]
+     * @return void
      */
     private function setExchanges()
     {
@@ -216,9 +216,10 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
-     * @param  [Message] &$message
-     * @param  [string] $queueName
-     * @return [void]
+     * @param  PhpAmqpLib\Message\AMQPMessage $message
+     * @param  string                         $queue
+     * @param  string                         $exchange
+     * @return void
      */
     private function defineDeliveryMode(&$message, $queue, $exchange)
     {

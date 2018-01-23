@@ -10,22 +10,22 @@ use MessageQueuePHP\Message\Message;
 class Publisher implements PublisherInterface
 {
     /**
-     * @var [AdapterInterface]
+     * @var MessageQueuePHP\Adapter\AdapterInterface
      */
     protected $adapter;
 
     /**
-     * @var [string]
+     * @var MessageQueuePHP\Message\Message
      */
     protected $payload;
 
     /**
-     * @var [string]
+     * @var string
      */
     protected $queue;
 
     /**
-     * @var [string]
+     * @var string
      */
     protected $exchange;
 
@@ -42,16 +42,17 @@ class Publisher implements PublisherInterface
     }
 
     /**
-     * @param [string] $message
+     * @param string $message
+     * @param array  $properties
      */
-    public function setMessage($message)
+    public function setMessage($message, $properties = [])
     {
-        $this->payload = new Message($message);
+        $this->payload = new Message($message, $properties);
         return $this;
     }
 
     /**
-     * @return [void]
+     * @return void
      */
     public function send()
     {

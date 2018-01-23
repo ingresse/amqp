@@ -16,7 +16,7 @@ use OutOfBoundsException;
 class QueueLogger implements AdapterInterface
 {
     /**
-     * @var [Monolog\Logger]
+     * @var Monolog\Logger
      */
     private $logger;
 
@@ -51,6 +51,7 @@ class QueueLogger implements AdapterInterface
      * @param string $message
      * @param string $level
      * @param array  $extras
+     * @return void
      */
     public function setMessage($message, $level, array $extras = array())
     {
@@ -58,9 +59,9 @@ class QueueLogger implements AdapterInterface
     }
 
     /**
-     * @param  Message $message
-     * @param  string $queue
-     * @param  string $exchange
+     * @param  MessageQueuePHP\Message\Message $message
+     * @param  string                          $queue
+     * @param  string                          $exchange
      * @return void
      */
     public function send(Message $message, $queue, $exchange)
