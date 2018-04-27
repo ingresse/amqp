@@ -126,7 +126,7 @@ class AMQPAdapter implements AdapterInterface
      */
     public function send(Message $message, $queue, $exchange)
     {
-        $amqpMessage = new AMQPMessage($message->getPayload(), $message->getOptions());
+        $amqpMessage = new AMQPMessage($message->getPayload(), $message->getProperties());
 
         $this->defineDeliveryMode($amqpMessage, $queue, $exchange);
 
