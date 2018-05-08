@@ -36,6 +36,10 @@ class AMQPAdapter implements AdapterInterface
      * @var Ingresse\Logger\QueueLogger
      */
     public $logger;
+    /**
+     * @var array
+     */
+    private $messages = [];
 
     /**
      * @param MessageQueuePHP\Config\ConfigInterface $config
@@ -171,6 +175,52 @@ class AMQPAdapter implements AdapterInterface
     }
 
     /**
+     * @param  string        $queue
+     * @param  string        $consumeTag
+     * @return void
+     */
+    public function receive($queue, $consumeTag, $timeout = 0)
+    {
+        $params = $this->config['consume'][$consumeTag];
+        $this->channel->basic_consume(
+            $queue,
+            $consumeTag,
+            $params['noLocal'],
+            $params['noAck'],
+            $params['exclusive'],
+            $params['noWait'],
+            function (AMQPMessage $message) {
+                $this->messages[] = $message;
+            }
+        );
+
+        if ($message = $this->getMessage()) {
+            return $message;
+        }
+
+        while (true) {
+            $start = microtime(true);
+
+            if ($message = $this->getMessage()) {
+                return $message;
+            }
+
+            $this->channel->wait(null, false, $timeout / 1000);
+
+            if ($timeout == 0) {
+                continue;
+            }
+
+            $stop = microtime(true);
+            $timeout -= ($stop - $start) * 1000;
+
+            if ($timeout <= 0) {
+                break;
+            }
+        }
+    }
+
+    /**
      * @return void
      */
     public function close()
@@ -231,5 +281,16 @@ class AMQPAdapter implements AdapterInterface
 
         $params = $this->config['queues'][$queue];
         $message->set('delivery_mode', $params['delivery_mode']);
+    }
+
+    /**
+     * @param  string $consumerTag
+     * @return Message|null
+     */
+    private function getMessage()
+    {
+        if (!empty($this->messages)) {
+            return array_shift($this->messages);
+        }
     }
 }
