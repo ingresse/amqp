@@ -51,6 +51,8 @@ class Factory
                     );
                 }
             } while (time() < $endTime);
+
+            throw new TimeoutException($runTimeout, $correlationId);
         };
 
         return new Promise($getResponse);

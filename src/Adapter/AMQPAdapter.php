@@ -37,6 +37,10 @@ class AMQPAdapter implements AdapterInterface
      */
     public $logger;
     /**
+     * @var string
+     */
+    private $consumerTag;
+    /**
      * @var array
      */
     private $messages = [];
@@ -181,18 +185,22 @@ class AMQPAdapter implements AdapterInterface
      */
     public function receive($queue, $consumeTag, $timeout = 0)
     {
-        $params = $this->config['consume'][$consumeTag];
-        $this->channel->basic_consume(
-            $queue,
-            $consumeTag,
-            $params['noLocal'],
-            $params['noAck'],
-            $params['exclusive'],
-            $params['noWait'],
-            function (AMQPMessage $message) {
-                $this->messages[] = $message;
-            }
-        );
+        if (empty($this->consumerTag)) {
+            $params = $this->config['consume'][$consumeTag];
+            $this->channel->basic_consume(
+                $queue,
+                $consumeTag,
+                $params['noLocal'],
+                $params['noAck'],
+                $params['exclusive'],
+                $params['noWait'],
+                function (AMQPMessage $message) {
+                    $this->messages[] = $message;
+                }
+            );
+
+            $this->consumerTag = $consumeTag;
+        }
 
         if ($message = $this->getMessage()) {
             return $message;
