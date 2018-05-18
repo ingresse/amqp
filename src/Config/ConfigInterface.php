@@ -5,7 +5,7 @@ namespace MessageQueuePHP\Config;
 interface ConfigInterface
 {
     /**
-     * @return [void]
+     * @return void
      */
     public function getConfig();
 }

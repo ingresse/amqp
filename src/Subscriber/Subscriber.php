@@ -9,17 +9,17 @@ use MessageQueuePHP\Adapter\AdapterInterface;
 class Subscriber implements SubscriberInterface
 {
     /**
-     * @var [AdapterInterface]
+     * @var AdapterInterface
      */
     private $adapter;
 
     /**
-     * @var [ConsumerInterface]
+     * @var ConsumerInterface
      */
     private $consumer;
 
     /**
-     * @var [string]
+     * @var string
      */
     private $queue;
 
@@ -41,8 +41,8 @@ class Subscriber implements SubscriberInterface
     }
 
     /**
-     * @param  [string] $queue
-     * @return [void]
+     * @param string $queue
+     * @return self
      */
     public function subscribe($queue)
     {
@@ -51,16 +51,14 @@ class Subscriber implements SubscriberInterface
     }
 
     /**
-     * @return [void]
+     * @return mixed
      */
     public function consume()
     {
-        $this
-            ->adapter
-            ->consume(
-                $this->queue, 
-                $this->consumer->getTag(),
-                array($this->consumer, 'work')
-            );
+        return $this->adapter->consume(
+            $this->queue,
+            $this->consumer->getTag(),
+            array($this->consumer, 'work')
+        );
     }
 }

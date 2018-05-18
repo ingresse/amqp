@@ -20,7 +20,7 @@ class AMQPConfig implements ConfigInterface
     }
 
     /**
-     * @return [array]
+     * @return array
      */
     public function getConfig()
     {

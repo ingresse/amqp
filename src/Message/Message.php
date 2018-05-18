@@ -5,20 +5,27 @@ namespace MessageQueuePHP\Message;
 class Message
 {
     /**
-     * @var [stribg]
+     * @var array
      */
     protected $payload;
 
     /**
-     * @param [string] $payload
+     * @var array
      */
-    public function __construct($payload)
+    protected $properties;
+
+    /**
+     * @param array $payload
+     * @param array $properties
+     */
+    public function __construct($payload, $properties = [])
     {
         $this->payload = $payload;
+        $this->properties = $properties;
     }
 
     /**
-     * @return [string]
+     * @return array
      */
     public function getPayload()
     {
@@ -26,7 +33,15 @@ class Message
     }
 
     /**
-     * @return [string]
+     * @return array
+     */
+    public function getProperties()
+    {
+        return $this->properties;
+    }
+
+    /**
+     * @return string
      */
     public function toJson()
     {

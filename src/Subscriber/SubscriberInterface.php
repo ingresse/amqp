@@ -12,12 +12,12 @@ interface SubscriberInterface
     public function setConsumer(ConsumerInterface $consumer);
 
     /**
-     * @param  [string] $queue
+     * @param string $queue
      */
     public function subscribe($queue);
 
     /**
-     * @return [void]
+     * @return void
      */
     public function consume();
 }

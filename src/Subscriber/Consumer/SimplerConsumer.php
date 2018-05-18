@@ -1,13 +1,13 @@
 <?php
 
-namespace Ingresse\MessageQueuePHP\Subscriber\Consumer;
+namespace MessageQueuePHP\Subscriber\Consumer;
 
-use Ingresse\MessageQueuePHP\Subscriber\Consumer\ConsumerInterface;
+use MessageQueuePHP\Subscriber\Consumer\ConsumerInterface;
 
 class SimplerConsumer implements ConsumerInterface
-{   
+{
     /**
-     * @return [string]
+     * @return string
      */
     public function getTag()
     {
@@ -15,8 +15,7 @@ class SimplerConsumer implements ConsumerInterface
     }
 
     /**
-     * @param  [string] $message
-     * @return [dump]
+     * @param string $message
      */
     public function work($message)
     {
