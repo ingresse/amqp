@@ -14,7 +14,7 @@ class FactoryAdapter
      * @param  array  $logger
      * @return MessageQueuePHP\Adapter\AMQPAdapter
      */
-    public function create(
+    public static function create(
         array $connection,
         array $queues,
         array $exchanges,
