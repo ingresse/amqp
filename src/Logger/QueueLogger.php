@@ -104,7 +104,7 @@ class QueueLogger implements AdapterInterface
         $defaultParams = ['host', 'port', 'key', 'channel', 'path'];
 
         foreach ($defaultParams as $arg) {
-            if (!isset($config['logger'][$arg])) {
+            if (!array_key_exists($arg, $config['logger'])) {
                 throw new OutOfBoundsException(
                     "Parameters of LoggerAdapter MessageQueue
                     are missing. Check config settings."
